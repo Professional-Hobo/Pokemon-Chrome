@@ -1,0 +1,62 @@
+@headers
+music = route101
+!headers
+@vars
+b = SAND_PATH_TOP_M
+c = SAND_PATH_TOP_R
+d = SAND_PATH_MID_L
+e = SAND_PATH_MID_M
+f = SAND_PATH_MID_R
+g = SAND_PATH_BOT_L
+h = SAND_PATH_BOT_M
+k = SAND_PATH_TR_CRNR
+m = SAND_PATH_TL_CRNR
+l = SAND_PATH_BL_CRNR
+n = WILD_GRASS
+A = STON_PATH_TOP_L
+B = STON_PATH_TOP_M
+C = STON_PATH_TOP_R
+D = STON_PATH_MID_L
+F = STON_PATH_MID_R
+G = STON_PATH_BOT_L
+H = STON_PATH_BOT_M
+I = STON_PATH_BOT_R
+J = STON_PATH_MID_M^POKEBALL
+P = WILD_GRASS^POKECENTER
+r = WILD_GRASS^ROCK
+!vars
+@map
+nnnnnnnnnnnnnnnnnnnn
+nnnPPPPPnnnnnnnnnnnn
+nnnPPPPPnnnnnnnnnnnn
+nnnPPPPPnnnnnnnnnnnn
+nnnPPPPPnnnnnnnnnnnn
+nnnPPPPPnnnnnnnnnnnn
+nnnndefnnnnnrnnnnnnn
+nnnndefnnnnnnnnnnnnn
+bbbbmefnnnnnnnnnnnnn
+eeeeeefnnnnnnnnnnnnn
+hhhhlefnnrnnnnnrnnnn
+nnnndefnnnnnnnnnnnnn
+nnnndefnnnnnnnnnnnnn
+nnnndefnnnnnnnnnnnnn
+nnnndekbbbbcnnnnABCn
+nnnndeeeeeefnnnnDJFn
+nnnnghhhhhlfnnnnGHIn
+rrrrrrrrrrdfrrrrrrrr
+!map
+@warps
+// Littleroot
+12x18[2] = littleroot->12x1[2]
+11x18[2] = littleroot->11x1[2]
+1x11[3] = temp->20x11[3]
+1x10[3] = temp->20x10[3]
+1x9[3] = temp->20x9[3]
+!warps
+@events
+18x16 = "You found a Pokeball but there is nothing in it!" congrats
+10x11 = "You found a rock!11!1111!" congrats
+13x7 = "PLAYER found a gold nugget!" congrats_2
+16x11 = "You thought something would be here?"
+6x7 = "PLAYER found some secret sand!"^"GOOD JOB" congrats_2
+!events

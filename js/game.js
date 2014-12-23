@@ -40,21 +40,39 @@ function update() {
             }
         }
         if (value.ai) {
-            if (frame % 48 == 0) {
+            if (frame % 60 == 0) {
                 if (random(1, 100) > 90) {
                     value.move(random(0,3));
                 }
             }
         }
-        // If player is above npc, set npc z-index to 99
-        if (player.getY() > value.getY()) {
-            $("#"+value.getGUID()).css("z-index", 99);
-        } else {
-            $("#"+value.getGUID()).css("z-index", 101);
-        }
+        // Set NPC z-index
+        $("#"+value.getGUID()).css("z-index", (value.getY()+1000));
     });
+    // Set player z-index
+    $("#player").css("z-index", (player.getY()+1000));
 }
 
 function getAvgFPS() {
     return (frame/(lastTime-start)*1000).toFixed(2);
 }
+// running WIP //
+// onkeydown = onkeyup = function(e){
+//     e = e || event; // to deal with IE
+//     keys[e.keyCode] = e.type == 'keydown';
+//     if (keys[37] === true || keys[38] === true || keys[39] === true || keys[40] === true) {
+//         if (keys[66] === true) {
+//             player.running = true;
+//         } else {
+//             player.running = false;
+//         }
+//         e.preventDefault();
+//         if (!player.walking) {
+//             // Increase step counter
+//             player.steps++;
+//             player.move(dirs[e.which]);
+//             player.walking = true;
+//         }
+//     }
+// }
+///////////////////

@@ -1,0 +1,67 @@
+@headers
+music = littleroot
+!headers
+@vars
+. = GRASS_5
+a = TREE_2_BOT_L_NBG^TREE_2_TOP_L_NBG
+b = TREE_2_BOT_R_NBG^TREE_2_TOP_R_NBG
+A = TREE_2_BOT_L_NBG
+B = TREE_2_BOT_R_NBG
+c = TREE_2_MID_L_NBG
+d = TREE_2_MID_R_NBG
+e = TREE_2_BOT_L_NBG
+f = TREE_2_BOT_R_NBG
+F = GRASS_5^FLOWER
+//w = WILD_GRASS
+S = GRASS_5^METAL_SIGN
+s = GRASS_5^SAND_PATCH
+t = TREE_2_BOT_L_NBG^TREE_2_TOP_L_BG
+u = TREE_2_BOT_R_NBG^TREE_2_TOP_R_BG
+T = GRASS_5^TREE_2_TOP_L_BG
+U = GRASS_5^TREE_2_TOP_R_BG
+L = GRASS_5^OAKLAB
+P = GRASS_5^PLAYER_HOUSE
+R = GRASS_5^RIVAL_HOUSE
+!vars
+@map
+cdcdcdcdcd..cdcdcdcd
+abABABABAB..ABABABab
+cd................cd
+ef................ef
+..PPPPP......RRRRR..
+..PPPPP......RRRRR..
+..PPPPP......RRRRR..
+..PPPPP......RRRRR.F
+F.PPPPPS....SRRRRRF.
+.F...s........s....F
+F..F............F.F.
+....................
+...LLLLLLL..........
+...LLLLLLL.....S....
+...LLLLLLL..........
+...LLLLLLL........TU
+...LLLLLLL........cd
+TU.FFFSs........TUtu
+cd.FFF..........cdcd
+tuTUTUTUTUTUTUTUtutu
+!map
+@warps
+// For route 101
+11x1[0] = path->11x18[0]
+12x1[0] = path->12x18[0]
+
+// Trainer's house
+6x9[0]* = trainer_house_downstairs->9x9[0] door_open
+
+// Rival's house
+15x9[0]* = rival_house_downstairs->6x9[0] door_open
+
+// Birch's lab
+8x17[0]* = birch_lab->6x10[0] door_open
+!warps
+@events
+8x9 = "PLAYER's house"
+13x9 = "RIVAL's house"
+16x14 = "Farhan is fat"
+7x18 = "Prof. Birch's Lab"
+!events

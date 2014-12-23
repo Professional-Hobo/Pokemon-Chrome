@@ -71,7 +71,12 @@ Player.prototype.move = function(direction) {
     var validMove = true;
     var self = this;
 
-    // First check boundaries for invalid moves
+    // Check for warps
+    $.each(map.warps, function(index, warp) {
+        self.checkWarp(warp, direction);
+    });
+
+    // Next, check boundaries for invalid moves
     $.each(map.boundaries, function(index, value) {
         if (Math.abs(self.getRealX()+amt[direction].left-value.x) < 10 && Math.abs(self.getRealY()+4+amt[direction].top-value.y) < 10) {
             validMove = false;
@@ -107,36 +112,69 @@ Player.prototype.move = function(direction) {
 
         this.renderDirection[0] = amt[direction].xtile;
         this.renderDirection[1] = amt[direction].ytile;
+        return true;
+    } else {
+        return false;
     }
 };
 
 Player.prototype.renderMove = function() {
     // Check if player has completed move yet
-    if (this.renderFrame < 16) {
-        $("#player").css("left", "+="+this.renderDirection[0]);
-        $("#player").css("top", "+="+this.renderDirection[1]);
-        if (this.renderFrame == 4) {
+    if (this.running === true) {
+        div = 4;
+    } else {
+        div = 1;
+    }
+    if (this.renderFrame < (16/div)) {
+        $("#player").css("left", "+="+(this.renderDirection[0]*div));
+        $("#player").css("top", "+="+(this.renderDirection[1]*div));
+        if (this.renderFrame == 1) {
             this.animationFrame = this.animationFrameStep;
             this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
             $("#player").attr("src", "img/sprites/" + this.getSprite());
 
         }
-        if (this.renderFrame == 8) {
-            this.animationFrame = this.animationFrameStep;
-            this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
-            $("#player").attr("src", "img/sprites/" + this.getSprite());
-        }
-        if (this.renderFrame == 12) {
+        if (this.renderFrame == (12/div)) {
             this.animationFrame = 1;
             this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
             $("#player").attr("src", "img/sprites/" + this.getSprite());
         }
-        if (++this.renderFrame == 16) {
+        if (++this.renderFrame == (16/div)) {
             this.render = false;
             this.renderFrame = 0;
             this.renderDirection = [0, 0];
             this.walking = false;
             this.animationFrameStep = this.animationFrameStep == 2 ? 3 : 2;
         }
+    }
+};
+
+Player.prototype.checkWarp = function(warp, direction) {
+    src_x = +warp.src_coords["x"];
+    src_y = +warp.src_coords["y"];
+    dst_x = +warp.dst_coords["x"];
+    dst_y = +warp.dst_coords["y"];
+    dst_direction = warp.dst_direction;
+
+    // Valid warp
+    if ((this.getX()+amt[direction].xtile == src_x && this.getY()+amt[direction].ytile == src_y && (warp.src_direction === false || warp.walkin === true)) || this.getX() == src_x && this.getY() == src_y && +warp.src_direction === direction && warp.src_direction !== false) {
+
+        // Update map id
+        map = new Pokemap(warp.map);
+        player.setX(dst_x);
+        player.setY(dst_y);
+
+        // Play warp sound if any
+        if (warp.sound !== false) {
+            //map.sound = new buzz.sound('sounds/' + warp.sound + '.m4a');
+            //sound.play();
+        }
+
+        // Show walk animation first and then update
+        if (warp.walkin === true && warp.src_direction == direction) {
+            player.move(direction);
+        }
+        map.render();
+        //this.walking = false;
     }
 };
