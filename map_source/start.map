@@ -42,28 +42,32 @@ M = GRASS_5^WATER_BOT_L
 E = GRASS_5^WATER_BOT_M
 K = GRASS_5^WATER_BOT_R
 1 = WATER_MID_M^LADDER
+2 = SAND_PATH_BOT_M^TREE_2_TOP_L_BG
+3 = SAND_PATH_BOT_M^TREE_2_TOP_R_BG
+4 = SAND_PATH_BOT_M^TREE_2_TOP_R_BG
+5 = SAND_PATH_BOT_R^TREE_2_TOP_R_BG
 !vars
 @map
 cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd
-ABABABABABABABABABABABABABababab
-cdcd.fffffffff............cdcdcd
-ABAB.fZXXXXXWf..LLLLLLL...ababab
-cdcd.fVIIIIINf..LLLLLLL...cdcdcd
-ABAB.fVIIIIINf..LLLLLLL...ababab
-cdcd.fVIIIIINf..LLLLLLL...cdcdcd
-ABAB.fMEEEEEKf..LLLLLLL...ABABAB
-zzzx.fffffffff............wwwwww
+ababABABABABABABABABABABABababab
+cdcd.....f................cdcdcd
+abab..ZXXXXXWf..LLLLLLL...ababab
+cdcd.fVIIIIIN...LLLLLLL...cdcdcd
+abab..VIIIIINf..LLLLLLL...ababab
+cdcd..VIIIIIN...LLLLLLL...cdcdcd
+ABAB..MEEEEEK...LLLLLLLS..ABABAB
+zzzx.....f................wwwwww
 eeeq......................wwwwww
 eeeq......................wwwwww
-hhhi......................CDCDCD
+2325......................CDCDCD
 cdcd....PPPPP....RRRRR....cdcdcd
-ABAB....PPPPP....RRRRR....ababab
+abab....PPPPP....RRRRR....ababab
 cdcd....PPPPP....RRRRR....cdcdcd
-ABAB....PPPPP....RRRRR....ababab
+abab....PPPPP....RRRRR....ababab
 cdcd...SPPPPP....RRRRRS...cdcdcd
-ABAB.......s......s.......ababab
+abab.......s......s.......ababab
 cdcd......................cdcdcd
-ABABTUTUTUTUTUTUTUTUTUTUTUababab
+ababTUTUTUTUTUTUTUTUTUTUTUababab
 cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd
 abababababababababababababababab
 !map
