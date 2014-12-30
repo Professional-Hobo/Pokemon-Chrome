@@ -3,6 +3,7 @@ const ID = "id";
 const BND = "boundary";
 const FLP = "flip";
 const WLK = "walkable";
+const ANM = "animation";
 
 class Tile
 {
@@ -55,7 +56,7 @@ class Tile
     // Bush, rock, flower
     BUSH              = array(ID => 0x000A, BND => 0x1),
     ROCK              = array(ID => 0x000B, BND => 0x1),
-    FLOWER            = array(ID => 0x0CD7, BND => 0x0),
+    FLOWER            = array(ID => 0x0CD7, BND => 0x0, ANM => 0x1),
     SAND_PATCH        = array(ID => 0x0CD6, BND => 0x0),
 
     // Path
@@ -239,13 +240,27 @@ class Tile
     RIVAL_HOUSE_22   = array(ID => 0x1283, BND => 0x0, FLP => 0x0),
     RIVAL_HOUSE_23   = array(ID => 0x1282, BND => 0x1, FLP => 0x1),
     RIVAL_HOUSE_24   = array(ID => 0x1281, BND => 0x1, FLP => 0x1),
-    RIVAL_HOUSE_25   = array(ID => 0x1280, BND => 0x1, FLP => 0x1);
+    RIVAL_HOUSE_25   = array(ID => 0x1280, BND => 0x1, FLP => 0x1),
 
+    WATER_TOP_L      = array(ID => 0x0100, BND => 0x0),
+    WATER_TOP_M      = array(ID => 0x0101, BND => 0x0),
+    WATER_TOP_R      = array(ID => 0x0102, BND => 0x0),
+    WATER_MID_L      = array(ID => 0x0108, BND => 0x0),
+    WATER_MID_M      = array(ID => 0x0109, BND => 0x0),
+    WATER_MID_R      = array(ID => 0x010A, BND => 0x0),
+    WATER_BOT_L      = array(ID => 0x0110, BND => 0x0),
+    WATER_BOT_M      = array(ID => 0x0111, BND => 0x0),
+    WATER_BOT_R      = array(ID => 0x0112, BND => 0x0),
+
+    LADDER           = array(ID => 0x010B, BND => 0x0);
+
+    private $id;
     private $type;
     private $coords;
     private $boundary;
     private $flip;
     private $walk;
+    private $animation;
 
     public function Tile($type) {
         $this->type = $type;
@@ -261,6 +276,7 @@ class Tile
         $bnd = $tile[BND];
         $flp = $tile[FLP];
         $wlk = $tile[WLK];
+        $anm = $tile[ANM];
         $x = $pos%8;
         $y = floor($pos/8);
         $this->coords = array($x, $y);
@@ -283,6 +299,14 @@ class Tile
         } else {
             $this->walk = false;
         }
+
+        if ($anm) {
+            $this->animation = true;
+        } else {
+            $this->animation = false;
+        }
+
+        $this->id = $pos;
     }
 
     public function getCoords() {
@@ -316,7 +340,7 @@ class Tile
         } else {
             header('Content-Type: image/png');
         }
-        imagepng($img);
+        imagepng($img, null, 0);
         if ($return) {
             return ob_get_clean();
         }
@@ -343,8 +367,19 @@ class Tile
         return false;
     }
 
+    public function hasAnimation() {
+        if ($this->animation) {
+            return true;
+        }
+        return false;
+    }
+
     public function getType() {
         return $this->type;
+    }
+
+    public function getID() {
+        return $this->id;
     }
 }
 

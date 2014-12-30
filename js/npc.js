@@ -1,6 +1,13 @@
 function NPC(x, y, direction, sprite) {
     Entity.call(this);
-    this.realx = 1;
+    this.setSprite(typeof sprite !== 'undefined' ? sprite : "man_1");
+    // Special sprite cases
+    if (this.sprite == "boy_1") {
+        this.offsety = 2;
+        this.offsetx = 2;
+    } else if (this.sprite == "man_1" || this.sprite == "woman_1") {
+        this.offsety = -4;
+    }
     this.setX(x);
     this.setY(y);
     this.steps = 0;
@@ -9,24 +16,18 @@ function NPC(x, y, direction, sprite) {
     this.renderDirection = [0, 0];
     this.animationFrame = 1;
     this.animationFrameStep = 2;
-    this.setSprite(typeof sprite !== 'undefined' ? sprite : "man_1");
     this.setType(typeof sprite !== 'undefined' ? sprite : "man_1");
     this.setDirection(typeof direction !== 'undefined' ? direction : 0);
     this.ai = false;
-    entities.push(this);
+    map.entities.push(this);
 }
 // Extend Entity class
 NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
-Entity.prototype.setX = function(val) {
-    this.x = typeof val !== 'undefined' ? val : 0;
-    this.realx = ((this.x-1)*16)+1;
-};
-
 // Method definitions //
 NPC.prototype.getDirection = function(name) {
-    typeof name !== 'undefined' ? true : false
+    name = typeof name !== 'undefined' ? true : false
     if (name) {
         return directions[this.direction];
     }
@@ -76,7 +77,7 @@ NPC.prototype.move = function(direction) {
 
     // First check boundaries for invalid moves
     $.each(map.boundaries, function(index, value) {
-        if (Math.abs(self.getRealX()+amt[direction].left-value.x-1) < 10 && Math.abs(self.getRealY()+8+amt[direction].top-value.y) < 10) {
+        if (Math.abs(self.getRealX()+amt[direction].left-value.x+self.offsetx) < 10 && Math.abs(self.getRealY()+amt[direction].top-value.y+self.offsety) < 10) {
             validMove = false;
             console.error("NPC cannot be moved " + directions[direction] + ". Boundary in the way.");
             return false;
@@ -84,14 +85,15 @@ NPC.prototype.move = function(direction) {
     });
 
     // Next, see if NPC will still be within the map
-    if (this.getRealX()+amt[direction].left-1 >= map.getWidth() || this.getRealX()+amt[direction].left-1 < 0 || this.getRealY()+amt[direction].top+8 >= map.getHeight() || this.getRealY()+amt[direction].top+8 < 0) {
+    if (Math.abs(this.getRealX()+amt[direction].left+this.offsetx-map.getWidth()) < 10 || this.getRealX()+amt[direction].left+this.offsetx < 0 || Math.abs(this.getRealY()+amt[direction].top+this.offsety-map.getHeight()) < 10 || this.getRealY()+amt[direction].top+this.offsety < 0) {
+        console.log(Math.abs(this.getRealY()+amt[direction].top+this.offsety-map.getHeight()));
         validMove = false;
         console.error("NPC cannot be moved " + directions[direction] + " or else NPC would be out of bounds.");
     }
 
     // See if NPC will collide with any other entities
-    $.each(entities, function(index, value) {
-        if (Math.abs(self.getRealX()+amt[direction].left-value.getRealX()) < 10 && Math.abs(self.getRealY()+4+amt[direction].top-value.getRealY()) < 10) {
+    $.each(map.entities, function(index, value) {
+        if (Math.abs(self.getRealX()+amt[direction].left-value.getRealX()+self.offsetx) < 10 && Math.abs(self.getRealY()+amt[direction].top-value.getRealY()+self.offsety) < 10) {
             validMove = false;
             console.error("NPC cannot be moved " + directions[direction] + " or else NPC would collide with another NPC.");
             return false;
@@ -99,7 +101,7 @@ NPC.prototype.move = function(direction) {
     });
 
     // Finally check if NPC will collide with player
-    if (Math.abs(self.getRealX()+amt[direction].left-player.getRealX()) < 10 && Math.abs(self.getRealY()+4+amt[direction].top-player.getRealY()) < 10) {
+    if (Math.abs(self.getRealX()+amt[direction].left-player.getRealX()+self.offsetx) < 10 && Math.abs(self.getRealY()+amt[direction].top-player.getRealY()+self.offsety) < 10) {
         validMove = false;
         console.error("NPC cannot be moved " + directions[direction] + " or else NPC would collide with player.");
     }
@@ -111,8 +113,8 @@ NPC.prototype.move = function(direction) {
     if (validMove && !this.walking) {
         this.walking = true;
         // Change internal walking
-        this.setX(this.getX()+(amt[direction].left/16));
-        this.setY(this.getY()+(amt[direction].top/16));
+        this.setX(this.getX()+amt[direction].xtile);
+        this.setY(this.getY()+amt[direction].ytile);
 
         this.renderDirection[0] = amt[direction].xtile;
         this.renderDirection[1] = amt[direction].ytile;
@@ -120,7 +122,7 @@ NPC.prototype.move = function(direction) {
 };
 
 NPC.prototype.renderMove = function() {
-    // Check if player has completed move yet
+    // Check if npc has completed move yet
     if (this.renderFrame < 16) {
         $("#"+this.getGUID()).css("left", "+="+this.renderDirection[0]);
         $("#"+this.getGUID()).css("top", "+="+this.renderDirection[1]);
@@ -149,6 +151,21 @@ NPC.prototype.preRender = function() {
     this.render = false;
 }
 
+NPC.prototype.remove = function() {
+    $('#' + this.getGUID()).remove();
+    var toRemove = objWithProp(map.entities, "guid", this.getGUID());
+
+    if (toRemove != -1) {
+        map.entities.splice(toRemove, 1);
+        console.log("NPC was removed.");
+        return true;
+    } else {
+        console.log("Failed to remove NPC.");
+        return false;
+    }
+}
+
 NPC.prototype.AI = function() {
     this.ai = !this.ai;
+    return this.ai;
 }

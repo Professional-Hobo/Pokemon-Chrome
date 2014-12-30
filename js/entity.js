@@ -3,7 +3,9 @@ function Entity() {
     this.x = 0;
     this.y = 0;
     this.realx = 0;
-    this.realy = -4;
+    this.realy = 0;
+    this.offsetx = 0;
+    this.offsety = 0;
     this.sprite = "man_1";
 }
 
@@ -13,7 +15,7 @@ Entity.prototype.getX = function() {
 
 Entity.prototype.setX = function(val) {
     this.x = typeof val !== 'undefined' ? val : 0;
-    this.realx = ((this.x-1)*16);
+    this.realx = ((this.x-1)*16+this.offsetx);
 };
 
 Entity.prototype.getY = function() {
@@ -22,7 +24,7 @@ Entity.prototype.getY = function() {
 
 Entity.prototype.setY = function(val) {
     this.y = typeof val !== 'undefined' ? val : 0;
-    this.realy = ((this.y-1)*16)-4;
+    this.realy = ((this.y-1)*16+this.offsety);
 };
 
 Entity.prototype.getCoords = function() {

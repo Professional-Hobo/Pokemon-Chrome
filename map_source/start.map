@@ -1,0 +1,83 @@
+@headers
+zone = start
+music = route101
+!headers
+@vars
+. = GRASS_5
+P = GRASS_5^PLAYER_HOUSE
+S = GRASS_5^METAL_SIGN
+s = GRASS_5^SAND_PATCH
+f = GRASS_5^FLOWER
+R = GRASS_5^RIVAL_HOUSE
+c = TREE_2_MID_L_NBG
+d = TREE_2_MID_R_NBG
+a = TREE_2_BOT_L_NBG^TREE_2_TOP_L_NBG
+b = TREE_2_BOT_R_NBG^TREE_2_TOP_R_NBG
+A = WILD_GRASS^TREE_2_BOT_L_NBG
+B = WILD_GRASS^TREE_2_BOT_R_NBG
+C = WILD_GRASS^TREE_2_TOP_L_BG
+D = WILD_GRASS^TREE_2_TOP_R_BG
+L = GRASS_5^OAKLAB
+w = WILD_GRASS
+T = GRASS_5^TREE_2_TOP_L_BG
+U = GRASS_5^TREE_2_TOP_R_BG
+z = SAND_PATH_TOP_M
+x = SAND_PATH_TOP_R
+y = SAND_PATH_MID_L
+e = SAND_PATH_MID_M
+q = SAND_PATH_MID_R
+g = SAND_PATH_BOT_L
+h = SAND_PATH_BOT_M
+i = SAND_PATH_BOT_R
+k = SAND_PATH_TR_CRNR
+m = SAND_PATH_TL_CRNR
+l = SAND_PATH_BL_CRNR
+Z = GRASS_5^WATER_TOP_L
+X = GRASS_5^WATER_TOP_M
+W = GRASS_5^WATER_TOP_R
+V = GRASS_5^WATER_MID_L
+I = GRASS_5^WATER_MID_M
+N = GRASS_5^WATER_MID_R
+M = GRASS_5^WATER_BOT_L
+E = GRASS_5^WATER_BOT_M
+K = GRASS_5^WATER_BOT_R
+1 = WATER_MID_M^LADDER
+!vars
+@map
+cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd
+ABABABABABABABABABABABABABababab
+cdcd.fffffffff............cdcdcd
+ABAB.fZXXXXXWf..LLLLLLL...ababab
+cdcd.fVIIIIINf..LLLLLLL...cdcdcd
+ABAB.fVIIIIINf..LLLLLLL...ababab
+cdcd.fVIIIIINf..LLLLLLL...cdcdcd
+ABAB.fMEEEEEKf..LLLLLLL...ABABAB
+zzzx.fffffffff............wwwwww
+eeeq......................wwwwww
+eeeq......................wwwwww
+hhhi......................CDCDCD
+cdcd....PPPPP....RRRRR....cdcdcd
+ABAB....PPPPP....RRRRR....ababab
+cdcd....PPPPP....RRRRR....cdcdcd
+ABAB....PPPPP....RRRRR....ababab
+cdcd...SPPPPP....RRRRRS...cdcdcd
+ABAB.......s......s.......ababab
+cdcd......................cdcdcd
+ABABTUTUTUTUTUTUTUTUTUTUTUababab
+cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd
+abababababababababababababababab
+!map
+@warps
+// For route 101
+//11x1[0] = path->11x18[0]
+//12x1[0] = path->12x18[0]
+
+// Trainer's house
+12x17[0]* = trainer_house_downstairs->9x9[0] door_open
+
+// Rival's house
+//15x9[0]* = rival_house_downstairs->6x9[0] door_open
+
+// Birch's lab
+//8x17[0]* = birch_lab->6x10[0] door_open
+!warps

@@ -1,16 +1,17 @@
 function Player(x, y, direction, gender) {
     Entity.call(this);
+    this.offsety = -4;
     this.guid = guid;
     this.setX(x);
     this.setY(y);
     this.steps = 0;
     this.setGender(typeof gender !== 'undefined' && typeof gender !== 'number' ? gender : "male");
-    this.setDirection(direction);
-    this.render = false;
     this.renderFrame = 0;
     this.renderDirection = [0, 0];
     this.animationFrame = 1;
     this.animationFrameStep = 2;
+    this.setDirection(direction);
+    this.render = false;
 }
 // Extend Entity class
 Player.prototype = new Entity();
@@ -18,7 +19,7 @@ Player.prototype.constructor = Player;
 
 // Method definitions //
 Player.prototype.getDirection = function(name) {
-    typeof name !== 'undefined' ? true : false
+    name = typeof name !== 'undefined' ? true : false
     if (name) {
         return directions[this.direction];
     }
@@ -73,7 +74,11 @@ Player.prototype.move = function(direction) {
 
     // Check for warps
     $.each(map.warps, function(index, warp) {
-        self.checkWarp(warp, direction);
+        if (self.checkWarp(warp, direction) == false) {
+            validMove = false;
+            console.error("Player is using warp and will not be moved.");
+            return false;
+        }
     });
 
     // Next, check boundaries for invalid moves
@@ -81,6 +86,7 @@ Player.prototype.move = function(direction) {
         if (Math.abs(self.getRealX()+amt[direction].left-value.x) < 10 && Math.abs(self.getRealY()+4+amt[direction].top-value.y) < 10) {
             validMove = false;
             console.error("Player cannot be moved " + directions[direction] + ". Boundary in the way.");
+            map.bump.play();
             return false;
         }
     });
@@ -89,13 +95,15 @@ Player.prototype.move = function(direction) {
     if (this.getRealX()+amt[direction].left >= map.getWidth() || this.getRealX()+amt[direction].left < 0 || this.getRealY()+amt[direction].top+4 >= map.getHeight() || this.getRealY()+amt[direction].top+4 < 0) {
         validMove = false;
         console.error("Player cannot be moved " + directions[direction] + " or else player would be out of bounds.");
+        map.bump.play();
     }
 
     // And finally, see if player will collide with any other entities
-    $.each(entities, function(index, value) {
+    $.each(map.entities, function(index, value) {
         if (Math.abs(self.getRealX()+amt[direction].left-value.getRealX()) < 10 && Math.abs(self.getRealY()+4+amt[direction].top-value.getRealY()) < 10) {
             validMove = false;
             console.error("Player cannot be moved " + directions[direction] + " or else player would collide with NPC.");
+            map.bump.play();
             return false;
         }
     });
@@ -107,8 +115,8 @@ Player.prototype.move = function(direction) {
     if (validMove && !this.walking) {
         this.walking = true;
         // Change internal walking
-        this.setX(this.getX()+(amt[direction].left/16));
-        this.setY(this.getY()+(amt[direction].top/16));
+        this.setX(this.getX()+amt[direction].xtile);
+        this.setY(this.getY()+amt[direction].ytile);
 
         this.renderDirection[0] = amt[direction].xtile;
         this.renderDirection[1] = amt[direction].ytile;
@@ -120,26 +128,17 @@ Player.prototype.move = function(direction) {
 
 Player.prototype.renderMove = function() {
     // Check if player has completed move yet
-    if (this.running === true) {
-        div = 4;
-    } else {
-        div = 1;
-    }
-    if (this.renderFrame < (16/div)) {
-        $("#player").css("left", "+="+(this.renderDirection[0]*div));
-        $("#player").css("top", "+="+(this.renderDirection[1]*div));
-        if (this.renderFrame == 1) {
+    if (this.renderFrame < 16) {
+        $("#player").css("left", "+="+this.renderDirection[0]);
+        $("#player").css("top", "+="+this.renderDirection[1]);
+        if (this.renderFrame < 12) {
             this.animationFrame = this.animationFrameStep;
-            this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
-            $("#player").attr("src", "img/sprites/" + this.getSprite());
-
-        }
-        if (this.renderFrame == (12/div)) {
+        } else {
             this.animationFrame = 1;
-            this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
-            $("#player").attr("src", "img/sprites/" + this.getSprite());
         }
-        if (++this.renderFrame == (16/div)) {
+        this.sprite = "player/" + this.getGender() + "_1/" + this.getDirection(true) + "_" + this.animationFrame + ".png";
+        $("#player").attr("src", "img/sprites/" + this.getSprite());
+        if (++this.renderFrame == 16) {
             this.render = false;
             this.renderFrame = 0;
             this.renderDirection = [0, 0];
@@ -155,26 +154,29 @@ Player.prototype.checkWarp = function(warp, direction) {
     dst_x = +warp.dst_coords["x"];
     dst_y = +warp.dst_coords["y"];
     dst_direction = warp.dst_direction;
+    self = this;
 
-    // Valid warp
+    // Valid warps
     if ((this.getX()+amt[direction].xtile == src_x && this.getY()+amt[direction].ytile == src_y && (warp.src_direction === false || warp.walkin === true)) || this.getX() == src_x && this.getY() == src_y && +warp.src_direction === direction && warp.src_direction !== false) {
-
+        this.walking = true;
         // Update map id
-        map = new Pokemap(warp.map);
-        player.setX(dst_x);
-        player.setY(dst_y);
+        map.update(warp.map, warp.music, function() {
+            self.setX(dst_x);
+            self.setY(dst_y);
 
-        // Play warp sound if any
-        if (warp.sound !== false) {
-            //map.sound = new buzz.sound('sounds/' + warp.sound + '.m4a');
-            //sound.play();
-        }
+            // Play warp sound if any
+            if (warp.sound !== false) {
+                //map.sound = new buzz.sound('sounds/' + warp.sound + '.m4a');
+                //sound.play();
+            }
 
-        // Show walk animation first and then update
-        if (warp.walkin === true && warp.src_direction == direction) {
-            player.move(direction);
-        }
-        map.render();
-        //this.walking = false;
+            // Show walk animation first and then update
+            if (warp.walkin === true && warp.src_direction == direction) {
+                player.move(direction);
+            }
+            player.setDirection(dst_direction);
+            self.walking = false;
+        });
+        return false;
     }
 };

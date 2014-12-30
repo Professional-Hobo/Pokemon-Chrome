@@ -12,7 +12,7 @@ $genders = array("male", "female");
 $guid = $_GET['guid'];
 
 // Check if user exists
-if (Database::doesExist("users", "guid", $guid)) {
+if (Database::doesExist("mine", "guid", $guid)) {
     $user = fetchUser($guid);
     $data["exists"] = true;
 } else {
@@ -25,7 +25,7 @@ $data["id"] = $user->id;
 $data["guid"] = $user->guid;
 
 $data["map"] = $user->map;
-$data["direction"] = $directions[$user->direction];
+$data["direction"] = $user->direction;
 $data["gender"] = $genders[$user->gender];
 
 $data["x"] = $user->x;

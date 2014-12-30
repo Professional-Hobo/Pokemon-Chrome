@@ -1,6 +1,30 @@
 function Pokemap(name, music) {
     this.setName(typeof name !== 'undefined' ? name : "littleroot");
     this.setMusic(typeof music !== 'undefined' ? music : "littleroot");
+    this.musicPlayer;
+    this.bump = new buzz.sound('sound/bump.m4a');
+    this.entities = [];
+    this.reload = true;
+}
+
+Pokemap.prototype.update = function(name, music, next) {
+    this.setName(typeof name !== 'undefined' ? name : "littleroot");
+    oldMusic = this.music;
+    this.setMusic(typeof music !== 'undefined' ? music : "littleroot");
+    this.removeAllEntities();
+    this.entities = [];
+    this.reload = true;
+
+    // Get new music
+    if (oldMusic != music) {
+        // Fadeout previous song and play new song
+        this.musicPlayer.fadeTo(0, 1000, function() {
+        this.musicPlayer = new buzz.sound('sound/music/' + music + '.m4a', {loop: true, volume: 0});
+        this.musicPlayer.fadeTo(50, 1000);
+        });
+    }
+
+    next();
 }
 
 Pokemap.prototype.getName = function() {
@@ -46,14 +70,8 @@ Pokemap.prototype.getTileHeight = function() {
 };
 
 Pokemap.prototype.render = function(callback) {
-    // Load/update map data
-    if ($("#walkables_css").length == 0) {
-        $('head').append(
-            $('<link id="walkables_css" rel="stylesheet" type="text/css" />').attr('href', 'data/walkables/' + this.getName() + '.css')
-        );
-    } else {
-        $('#walkables_css').attr('href', 'data/walkables/' + this.getName() + '.css');
-    }
+    // Load in walkables
+    $('#walkables_css').attr('href', 'data/walkables/' + this.getName() + '.css');
 
     // Map ID
     $("map").html(this.getName());
@@ -62,67 +80,46 @@ Pokemap.prototype.render = function(callback) {
     imgURL = 'data/img/' + this.getName() + '.png';
     self = this;
 
-    // If map hasn't been made, create it else update
-    if ($("#map").length == 0) {
-        $('<img src="'+imgURL+'"/>').load(function(){
-            self.setWidth(this.width);
-            self.setHeight(this.height);
-            $('body').prepend('<div id="game" style="position: relative; left: 0; top: 0; width: ' + this.width + 'px; height: ' + this.height + 'px;">')
+   $('<img src="'+imgURL+'"/>').load(function(){
+        self.setWidth(this.width);
+        self.setHeight(this.height);
+        $('#game').css({width: this.width + "px", height: this.height + "px"});
 
-            // Load map and player sprite
-            $('#game').prepend('<img id="map" src="data/img/' + self.getName() + '.png" style="position: relative; top: 0; left: 0; z-index:0">');
-            $('#game').prepend('<img id="player" src="img/sprites/player/male_1/' + player.getDirection() + '_1.png" style="position: absolute; left: ' + player.getRealX() + 'px; top: ' + player.getRealY() + 'px; z-index:' + (player.getRealY()+1000) + '">');
-            $("#game").prepend("<div id='walkables'>");
-            $.get("data/walkables/" + self.getName() + ".html", function(data) {
-                $("#walkables").html(data);
-            });
-
-            // Load boundaries
-            $.getJSON("data/boundaries/" + self.getName() + ".json", function( data ) {
-                self.boundaries = data;
-            });
-
-            // Load warps
-            $.getJSON("data/warps/" + self.getName() + ".json", function( data ) {
-                self.warps = data;
-            });
-
-            // Load events
-            $.getJSON("data/events/" + self.getName() + ".json", function( data ) {
-                self.events = data;
+        // Load map and player sprite
+        $('#map').attr('src', 'data/img/' + self.getName() + '.png');
+        $('#player').attr('src', 'img/sprites/' + player.getSprite());
+        $('#player').css({left: player.getRealX() + "px", top: player.getRealY() + "px"});
+        $("#walkables").empty();
+        $.get("data/walkables/" + self.getName() + ".html", function(data) {
+            $("#walkables").html(data).promise().done(function() {
+                self.setMusic($("music").html());
+                self.musicPlayer = new buzz.sound('sound/music/' + map.music + '.m4a', {loop: true, volume: 0});
+                self.musicPlayer.fadeTo(50, 1000);
             });
         });
-    } else {
-        $('<img src="'+imgURL+'"/>').load(function(){
-            self.setWidth(this.width);
-            self.setHeight(this.height);
-            $('#game').css({width: this.width + "px", height: this.height + "px"});
 
-            // Load map and player sprite
-            $('#map').attr('src', 'data/img/' + self.getName() + '.png');
-            $('#game').attr('src', 'img/sprites/player/male_1/' + player.getDirection() + '_1.png');
-            $('#player').css({left: player.getRealX() + "px", top: player.getRealY() + "px"});
-            $("#walkables").empty();
-            $.get("data/walkables/" + self.getName() + ".html", function(data) {
-                $("#walkables").html(data);
-            });
-
-            // Load boundaries
-            $.getJSON("data/boundaries/" + self.getName() + ".json", function( data ) {
-                self.boundaries = data;
-            });
-
-            // Load warps
-            $.getJSON("data/warps/" + self.getName() + ".json", function( data ) {
-                self.warps = data;
-            });
-
-            // Load events
-            $.getJSON("data/events/" + self.getName() + ".json", function( data ) {
-                self.events = data;
-            });
+        // Load boundaries
+        $.getJSON("data/boundaries/" + self.getName() + ".json", function( data ) {
+            self.boundaries = data;
         });
-    }
+
+        // Load warps
+        $.getJSON("data/warps/" + self.getName() + ".json", function( data ) {
+            self.warps = data;
+        });
+
+        // Load events
+        $.getJSON("data/events/" + self.getName() + ".json", function( data ) {
+            self.events = data;
+        });
+    });
 
     typeof callback === 'function' && callback();
+}
+
+Pokemap.prototype.removeAllEntities = function() {
+    $.each(this.entities, function(index, value) {
+        $('#' + this.getGUID()).remove();
+    });
+    this.entities.splice(0, this.entities.length);
 }

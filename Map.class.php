@@ -3,7 +3,7 @@ require_once("Tile.class.php");
 class Map
 {
     const DEBUG       = true;
-    const STRICT      = true;
+    const STRICT      = false;
     const TILES       = "img/tiles.png";
     const GROUP_TILES = array("POKECENTER", "OAKLAB", "PLAYER_HOUSE", "RIVAL_HOUSE");
 
@@ -13,11 +13,13 @@ class Map
     private $map;
     private $id;
     private $vars;
+    private $dups;
     private $map_data;
     private $map_lines = 0;
     private $status = null;
     private $boundaries = array();
     private $walkables = array();
+    private $animations = array();
     private $group_tiles = array();
     private $unused = array();
     private $sections = array();
@@ -34,6 +36,7 @@ class Map
         $this->extractTiles();
         $this->extractWarps();
         $this->extractEvents();
+        $this->checkDups();
         $this->checkUnused();
         if (count($this->unused) != 0 && Map::STRICT) {
             echo $this->getStatus();
@@ -116,7 +119,11 @@ class Map
                         $this->group_tiles[$v] = 1;
                     }
                 }
-                $this->vars[$sep[0]] = $sep[1];
+                if (isset($this->vars[$sep[0]])) {
+                    $this->dups[] = $sep[0];
+                } else {
+                    $this->vars[$sep[0]] = $sep[1];
+                }
                 continue;
             }
             $constant = @constant("Tile::" . $sep[1]);
@@ -126,7 +133,11 @@ class Map
                 }
                 $this->setStatus("Invalid tile name <b>" . $sep[1] . "</b>.");
             } else {
-                $this->vars[$sep[0]] = $sep[1];
+                if (isset($this->vars[$sep[0]])) {
+                    $this->dups[] = $sep[0];
+                } else {
+                    $this->vars[$sep[0]] = $sep[1];
+                }
             }
         }
     }
@@ -275,6 +286,11 @@ class Map
                         $this->walkables[] = array("x" => $b*16, "y" => $a*16, "data" => base64_encode(Tile::getTileImage(constant("Tile::" . $fg->getType()))));
                     }
 
+                    // Check if there is an animation for this tile
+                    if ($fg->hasAnimation()) {
+                        $this->animations[] = array("x" => $b*16, "y" => $a*16, "data" => $fg->getID());
+                    }
+
                 } else {
                     // Apply tile
                     $tile = new Tile($this->vars[$lines[$a][$b]]);
@@ -288,6 +304,11 @@ class Map
                     // Check if foreground is is walkable
                     if ($tile->hasWalk()) {
                         $this->walkables[] = array("x" => $b*16, "y" => $a*16, "data" => base64_encode(Tile::getTileImage(constant("Tile::" . $tile->getType()))));
+                    }
+
+                    // Check if there is an animation for this tile
+                    if ($tile->hasAnimation()) {
+                        $this->animations[] = array("x" => $b*16, "y" => $a*16, "data" => $tile->getID());
                     }
 
                 }
@@ -313,6 +334,11 @@ class Map
             foreach ($this->walkables as $index => $walk) {
                 $css  .= "#WLK_" . $index . "{position:absolute; top: " . ($walk["y"]) . "px; left: " . ($walk["x"]) . "px; z-index: 10000;}\n";
                 $html .= "<img id=\"WLK_" . $index . "\" src=\"data:image/png;base64," . $walk["data"] . "\">\n";
+            }
+
+            foreach ($this->animations as $index => $animation) {
+                $css  .= "#ANM_" . $index . "{position:absolute; top: " . ($animation["y"]) . "px; left: " . ($animation["x"]) . "px; z-index: 1;}\n";
+                $html .= "<img id=\"ANM_" . $index . "\" src=\"img/animated_tiles/" . $animation["data"] . ".gif\">\n";
             }
 
             // Add music location
@@ -354,6 +380,15 @@ class Map
         }
         if (count($this->unused) != 0) {
             $this->setStatus("Unused variables were detected.", false);
+        }
+    }
+
+    private function checkDups() {
+        if (count($this->dups) != 0) {
+            echo "<pre>";
+            print_r($this->dups);
+            $this->setStatus("Duplicate variables were detected.", true);
+            die;
         }
     }
 

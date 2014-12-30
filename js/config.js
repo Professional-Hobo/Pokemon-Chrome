@@ -1,6 +1,5 @@
 var name = "Pokemon Chrome";
 var version = "1.0.0";
-var entities = [];
 var player;
 var map;
 var guid;
@@ -49,4 +48,22 @@ function inArray(value, array) {
 
 function random(min, max) {
     return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function newNPC() {
+    types = ["man_1", "woman_1", "boy_1"];
+    new NPC(random(1,20), random(1,20), DOWN, types[random(0,2)]).AI();
+}
+
+function removeAllEntities() {
+    map.removeAllEntities();
+}
+
+function objWithProp(array, attr, value) {
+    for(var i = 0; i < array.length; i++) {
+        if(array[i][attr] === value) {
+            return i;
+        }
+    }
+    return -1;
 }
